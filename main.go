@@ -10,7 +10,7 @@ import (
 func main() {
 	fmt.Println("HotLaunch started")
 
-	err := launcher.Launch("https://youtube.com")
+	err := launcher.Launch("D:/Steam/steam.exe")
 	if err != nil {
 		log.Println("Ошибка запуска:", err)
 	}
