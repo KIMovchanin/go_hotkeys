@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/KIMovchanin/go_hotkeys/internal/config"
 	"github.com/KIMovchanin/go_hotkeys/internal/hotkeys"
 	"github.com/KIMovchanin/go_hotkeys/internal/launcher"
 
@@ -30,6 +31,16 @@ func main() {
 
 func run() {
 	fmt.Println("Hotkeys app started.")
+
+	configBinds, err := config.Load("config.json")
+	if err != nil {
+		log.Fatal("Failed to load config:", err)
+	}
+
+	fmt.Println("Loaded config:")
+	for _, bind := range configBinds {
+		fmt.Println("-", bind.Name, bind.Hotkey, "->", bind.Target)
+	}
 
 	manager := hotkeys.NewManager()
 	defer manager.UnregisterAll() // активируется при завершении функции run, что удаляет все хоткеи

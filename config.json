@@ -1,0 +1,17 @@
+[
+  {
+    "name": "YouTube",
+    "hotkey": "Ctrl+Alt+Y",
+    "target": "https://www.youtube.com"
+  },
+  {
+    "name": "GitHub",
+    "hotkey": "Ctrl+Alt+G",
+    "target": "https://www.github.com/KIMovchanin"
+  },
+  {
+    "name": "Notepad",
+    "hotkey": "Ctrl+Alt+N",
+    "target": "notepad.exe"
+  }
+]
