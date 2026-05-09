@@ -42,6 +42,15 @@ func run() {
 		fmt.Println("-", bind.Name, bind.Hotkey, "->", bind.Target)
 	}
 
+	fmt.Println("Parsed hotkeys:")
+	for _, bind := range configBinds {
+		mods, key, err := hotkeys.ParseHotKey(bind.Hotkey)
+		if err != nil {
+			log.Fatal("Failed to parse hotkey for", bind.Name+":", err)
+		}
+		fmt.Println("-", bind.Name, mods, key)
+	}
+
 	manager := hotkeys.NewManager()
 	defer manager.UnregisterAll() // активируется при завершении функции run, что удаляет все хоткеи
 
