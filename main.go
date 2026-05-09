@@ -11,16 +11,8 @@ import (
 	"github.com/KIMovchanin/go_hotkeys/internal/hotkeys"
 	"github.com/KIMovchanin/go_hotkeys/internal/launcher"
 
-	"golang.design/x/hotkey"
 	"golang.design/x/hotkey/mainthread"
 )
-
-type Bind struct {
-	Name   string
-	Mods   []hotkey.Modifier
-	Key    hotkey.Key
-	Target string
-}
 
 func main() {
 	// mainthread.Init нужен, чтобы библиотека hotkey нормально работала
@@ -32,67 +24,31 @@ func main() {
 func run() {
 	fmt.Println("Hotkeys app started.")
 
-	configBinds, err := config.Load("config.json")
-	if err != nil {
-		log.Fatal("Failed to load config:", err)
-	}
-
-	fmt.Println("Loaded config:")
-	for _, bind := range configBinds {
-		fmt.Println("-", bind.Name, bind.Hotkey, "->", bind.Target)
-	}
-
-	fmt.Println("Parsed hotkeys:")
-	for _, bind := range configBinds {
-		mods, key, err := hotkeys.ParseHotKey(bind.Hotkey)
-		if err != nil {
-			log.Fatal("Failed to parse hotkey for", bind.Name+":", err)
-		}
-		fmt.Println("-", bind.Name, mods, key)
-	}
-
 	manager := hotkeys.NewManager()
 	defer manager.UnregisterAll() // активируется при завершении функции run, что удаляет все хоткеи
 
-	binds := []Bind{
-		{
-			Name:   "YouTube",
-			Mods:   []hotkey.Modifier{hotkey.ModCtrl, hotkey.ModAlt},
-			Key:    hotkey.KeyY,
-			Target: "https://www.youtube.com",
-		},
-		{
-			Name:   "GitHub",
-			Mods:   []hotkey.Modifier{hotkey.ModCtrl, hotkey.ModAlt},
-			Key:    hotkey.KeyG,
-			Target: "https://www.github.com/KIMovchanin",
-		},
-		{
-			Name:   "Notepad",
-			Mods:   []hotkey.Modifier{hotkey.ModCtrl, hotkey.ModAlt},
-			Key:    hotkey.KeyN,
-			Target: "notepad.exe",
-		},
+	configBinds, err := config.Load("config.json")
+	if err != nil {
+		log.Fatal("Error of read json:", err)
 	}
 
-	for _, bind := range binds {
-		currentBind := bind
-
-		err := manager.Register(currentBind.Mods, currentBind.Key,
-			func() {
-				fmt.Println("Opening", currentBind.Name)
-
-				err := launcher.Launch(currentBind.Target)
-				if err != nil {
-					log.Println("Failed to launch", currentBind.Name+":", err)
-				}
-			})
-
+	for _, bind := range configBinds {
+		mods, key, err := hotkeys.ParseHotKey(bind.Hotkey)
 		if err != nil {
-			log.Fatal("Failed to register hotkey:", err)
+			log.Fatal("Error of parsing:", err)
 		}
 
-		fmt.Println("Registered", currentBind.Name)
+		err = manager.Register(mods, key, func() {
+			err := launcher.Launch(bind.Target)
+			if err != nil {
+				log.Fatal("Error of launch:", err)
+			}
+		})
+		if err != nil {
+			log.Fatal("Error of register:", err)
+		}
+
+		fmt.Println("Registred:", bind.Hotkey)
 	}
 
 	fmt.Println("Press Ctrl + C to exit")
