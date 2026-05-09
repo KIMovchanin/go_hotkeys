@@ -14,6 +14,13 @@ import (
 	"golang.design/x/hotkey/mainthread"
 )
 
+type Bind struct {
+	Name   string
+	Mods   []hotkey.Modifier
+	Key    hotkey.Key
+	Target string
+}
+
 func main() {
 	// mainthread.Init нужен, чтобы библиотека hotkey нормально работала
 	// с системным event loop. В документации он указан как способ запускать
@@ -27,22 +34,47 @@ func run() {
 	manager := hotkeys.NewManager()
 	defer manager.UnregisterAll() // активируется при завершении функции run, что удаляет все хоткеи
 
-	err := manager.Register([]hotkey.Modifier{hotkey.ModCtrl, hotkey.ModAlt}, hotkey.KeyY,
-		func() {
-			fmt.Println("Opening youtube...")
-
-			err := launcher.Launch("https://www.youtube.com")
-			if err != nil {
-				log.Println("Failed to launch youtube:", err)
-			}
+	binds := []Bind{
+		{
+			Name:   "YouTube",
+			Mods:   []hotkey.Modifier{hotkey.ModCtrl, hotkey.ModAlt},
+			Key:    hotkey.KeyY,
+			Target: "https://www.youtube.com",
 		},
-	)
-
-	if err != nil {
-		log.Fatal("Failed to register hotkey:", err)
+		{
+			Name:   "GitHub",
+			Mods:   []hotkey.Modifier{hotkey.ModCtrl, hotkey.ModAlt},
+			Key:    hotkey.KeyG,
+			Target: "https://www.github.com/KIMovchanin",
+		},
+		{
+			Name:   "Notepad",
+			Mods:   []hotkey.Modifier{hotkey.ModCtrl, hotkey.ModAlt},
+			Key:    hotkey.KeyN,
+			Target: "notepad.exe",
+		},
 	}
 
-	fmt.Println("Ctrl + Alt + Y registered")
+	for _, bind := range binds {
+		currentBind := bind
+
+		err := manager.Register(currentBind.Mods, currentBind.Key,
+			func() {
+				fmt.Println("Opening", currentBind.Name)
+
+				err := launcher.Launch(currentBind.Target)
+				if err != nil {
+					log.Println("Failed to launch", currentBind.Name+":", err)
+				}
+			})
+
+		if err != nil {
+			log.Fatal("Failed to register hotkey:", err)
+		}
+
+		fmt.Println("Registered", currentBind.Name)
+	}
+
 	fmt.Println("Press Ctrl + C to exit")
 
 	waitForExit()
