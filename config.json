@@ -13,5 +13,10 @@
     "name": "Notepad",
     "hotkey": "Ctrl+Alt+N",
     "target": "notepad.exe"
+  },
+  {
+    "name": "Roblox Studio",
+    "hotkey": "Ctrl+Alt+R",
+    "target": "C:\\Users\\Kimovchanin\\AppData\\Local\\Roblox\\Versions\\version-b087ddbc37e94847\\RobloxStudioBeta.exe"
   }
 ]
