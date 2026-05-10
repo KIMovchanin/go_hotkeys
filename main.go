@@ -16,28 +16,6 @@ import (
 )
 
 func main() {
-	// Если длина предаваемых через консоль аргументов больше 1
-	// и этот аргумет "add", то запустить addBind().
-	// if len(os.Args) > 1 {
-	// 	switch os.Args[1] {
-	// 	case "add":
-	// 		addBind()
-	// 	case "delete":
-	// 		deleteBind()
-	// 	case "del":
-	// 		deleteBind()
-	// 	case "delete_all":
-	// 		deleteAllBinds()
-	// 	case "del_all":
-	// 		deleteAllBinds()
-	// 	case "see":
-	// 		seeBinds()
-	// 	default:
-	// 		printUsage()
-	// 	}
-	// 	return
-	// }
-
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "add":
@@ -141,6 +119,7 @@ func printUsage() {
 	fmt.Println(`  go run . add "Name" "Ctrl+Alt+R" "Target"`)
 	fmt.Println(`  go run . see`)
 	fmt.Println(`  go run . delete "Name"`)
+	fmt.Println(`  go run . delete_all`)
 }
 
 func deleteBind() {
@@ -153,7 +132,7 @@ func deleteBind() {
 
 	binds, err := config.Load("config.json")
 	if err != nil {
-		log.Fatal("Falied to load config:", err)
+		log.Fatal("Failed to load config:", err)
 	}
 
 	filtered := make([]config.Bind, 0, len(binds))
