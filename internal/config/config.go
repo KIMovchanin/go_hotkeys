@@ -12,14 +12,14 @@ type Bind struct {
 }
 
 func Load(path string) ([]Bind, error) {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) // вернёт слайс байтов
 	if err != nil {
 		return nil, err
 	}
 
 	var binds []Bind
 
-	err = json.Unmarshal(data, &binds)
+	err = json.Unmarshal(data, &binds) // те байты превратит в строки
 	if err != nil {
 		return nil, err
 	}
