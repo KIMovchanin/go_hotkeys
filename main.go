@@ -166,6 +166,7 @@ func deleteBind() {
 		for _, ntd := range namesToDelete {
 			if strings.EqualFold(strings.TrimSpace(bind.Name), strings.TrimSpace(ntd)) {
 				detected = true
+				deletedCount++
 				continue
 			}
 		}
@@ -173,7 +174,6 @@ func deleteBind() {
 			continue
 		}
 		filtered = append(filtered, bind)
-		deletedCount++
 	}
 
 	if deletedCount <= 0 {
