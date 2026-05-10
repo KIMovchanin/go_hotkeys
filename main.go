@@ -167,7 +167,7 @@ func deleteBind() {
 			if strings.EqualFold(strings.TrimSpace(bind.Name), strings.TrimSpace(ntd)) {
 				detected = true
 				deletedCount++
-				continue
+				break
 			}
 		}
 		if detected {
