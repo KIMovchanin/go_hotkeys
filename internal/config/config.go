@@ -26,3 +26,15 @@ func Load(path string) ([]Bind, error) {
 
 	return binds, nil
 }
+
+// функция записи новых биндов в json
+func Save(path string, binds []Bind) error {
+	// json.MarshalIndent превращает Go-структуры в красивые JSON-байты.
+	// MarshalIndent удобнее обычного Marshal, потому что файл остаётся читаемым.
+	data, err := json.MarshalIndent(binds, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, data, 0644)
+}

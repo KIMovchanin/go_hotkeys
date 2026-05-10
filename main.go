@@ -33,22 +33,23 @@ func run() {
 	}
 
 	for _, bind := range configBinds {
-		mods, key, err := hotkeys.ParseHotKey(bind.Hotkey)
+		currentBind := bind
+		mods, key, err := hotkeys.ParseHotKey(currentBind.Hotkey)
 		if err != nil {
 			log.Fatal("Error of parsing:", err)
 		}
 
 		err = manager.Register(mods, key, func() {
-			err := launcher.Launch(bind.Target)
+			err := launcher.Launch(currentBind.Target)
 			if err != nil {
-				log.Fatal("Error of launch:", err)
+				log.Println("Error of launch:", err, currentBind.Name)
 			}
 		})
 		if err != nil {
-			log.Fatal("Error of register:", err)
+			log.Fatal("Error of register:", err, currentBind.Name)
 		}
 
-		fmt.Println("Registred:", bind.Hotkey)
+		fmt.Println("Registered:", currentBind.Hotkey, "->", currentBind.Name)
 	}
 
 	fmt.Println("Press Ctrl + C to exit")
