@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/KIMovchanin/go_hotkeys/internal/config"
@@ -17,9 +18,37 @@ import (
 func main() {
 	// Если длина предаваемых через консоль аргументов больше 1
 	// и этот аргумет "add", то запустить addBind().
-	if len(os.Args) > 1 && os.Args[1] == "add" {
-		addBind()
+	// if len(os.Args) > 1 {
+	// 	switch os.Args[1] {
+	// 	case "add":
+	// 		addBind()
+	// 	case "delete":
+	// 		deleteBind()
+	// 	case "del":
+	// 		deleteBind()
+	// 	case "delete_all":
+	// 		deleteAllBinds()
+	// 	case "del_all":
+	// 		deleteAllBinds()
+	// 	case "see":
+	// 		seeBinds()
+	// 	default:
+	// 		printUsage()
+	// 	}
+	// 	return
+	// }
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "add":
+			addBind()
+		case "see":
+			seeBinds()
+		default:
+			printUsage()
+		}
 		return
+
 	}
 
 	// mainthread.Init нужен, чтобы библиотека hotkey нормально работала
@@ -52,6 +81,16 @@ func addBind() {
 		log.Fatal("Failed to load config:", err)
 	}
 
+	for _, bind := range binds {
+		if strings.EqualFold(bind.Name, newBind.Name) {
+			log.Fatal("Bind with this name already exists:", newBind.Name)
+		}
+
+		if strings.EqualFold(bind.Hotkey, newBind.Hotkey) {
+			log.Fatal("Bind with this hotkey already exists:", newBind.Hotkey)
+		}
+	}
+
 	binds = append(binds, newBind)
 
 	if err := config.Save("config.json", binds); err != nil {
@@ -59,6 +98,32 @@ func addBind() {
 	}
 
 	fmt.Println("Added: ", newBind.Hotkey, "->", newBind.Name)
+}
+
+func seeBinds() {
+	if len(os.Args) > 2 {
+		fmt.Println("You do not need to write more arguments then just 'see'")
+	}
+	binds, err := config.Load("config.json")
+	if err != nil {
+		log.Fatal("Failed to load config:", err)
+	}
+
+	if len(binds) == 0 {
+		fmt.Println("No binds configured")
+		return
+	}
+
+	for _, bind := range binds {
+		fmt.Println(bind.Hotkey, "->", bind.Name, "->", bind.Target)
+	}
+}
+
+func printUsage() {
+	fmt.Println("Usage:")
+	fmt.Println(`  go run .`)
+	fmt.Println(`  go run . add "Name" "Ctrl+Alt+R" "Target"`)
+	fmt.Println(`  go run . see`)
 }
 
 func run() {
