@@ -44,6 +44,22 @@ func main() {
 			addBind()
 		case "see":
 			seeBinds()
+		case "delete":
+			deleteBind()
+		case "del":
+			deleteBind()
+		case "delete_all":
+			deleteAll()
+		case "del_all":
+			deleteAll()
+		case "deleteall":
+			deleteAll()
+		case "delall":
+			deleteAll()
+		case "deleteAll":
+			deleteAll()
+		case "delAll":
+			deleteAll()
 		default:
 			printUsage()
 		}
@@ -124,6 +140,59 @@ func printUsage() {
 	fmt.Println(`  go run .`)
 	fmt.Println(`  go run . add "Name" "Ctrl+Alt+R" "Target"`)
 	fmt.Println(`  go run . see`)
+	fmt.Println(`  go run . delete "Name"`)
+}
+
+func deleteBind() {
+	if len(os.Args) < 3 {
+		fmt.Println(`Usage: go run . delete "Name" ["Another name"]`)
+		return
+	}
+
+	namesToDelete := os.Args[2:]
+
+	binds, err := config.Load("config.json")
+	if err != nil {
+		log.Fatal("Falied to load config:", err)
+	}
+
+	filtered := make([]config.Bind, 0, len(binds))
+
+	var deletedCount int = 0
+	detected := false
+
+	for _, bind := range binds {
+		detected = false
+		for _, ntd := range namesToDelete {
+			if strings.EqualFold(strings.TrimSpace(bind.Name), strings.TrimSpace(ntd)) {
+				detected = true
+				continue
+			}
+		}
+		if detected {
+			continue
+		}
+		filtered = append(filtered, bind)
+		deletedCount++
+	}
+
+	if deletedCount <= 0 {
+		log.Fatal("Bind not found:", namesToDelete)
+	}
+
+	if err := config.Save("config.json", filtered); err != nil {
+		log.Fatal("Failed to save config:", err)
+	}
+
+	fmt.Println("Deleted:", namesToDelete)
+}
+
+func deleteAll() {
+	if err := config.Save("config.json", []config.Bind{}); err != nil {
+		log.Fatal("Failed to save config:", err)
+	}
+
+	fmt.Println("All hotkeys was removed!")
 }
 
 func run() {
