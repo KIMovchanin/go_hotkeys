@@ -18,5 +18,10 @@
     "name": "Roblox Studio",
     "hotkey": "Ctrl+Alt+R",
     "target": "C:\\Users\\Kimovchanin\\AppData\\Local\\Roblox\\Versions\\version-b087ddbc37e94847\\RobloxStudioBeta.exe"
+  },
+  {
+    "name": "VS Code",
+    "hotkey": "ctrl+alt+v",
+    "target": "D:\\Microsoft VS Code\\Code.exe"
   }
 ]
