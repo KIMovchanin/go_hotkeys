@@ -106,3 +106,65 @@ func TestParseHotKey(t *testing.T) {
 		})
 	}
 }
+
+func TestSameHotKey(t *testing.T) {
+	tests := []struct {
+		name    string
+		left    string
+		right   string
+		want    bool
+		wantErr bool
+	}{
+		{
+			name:  "same exact hotkey",
+			left:  "Ctrl+Alt+Y",
+			right: "Ctrl+Alt+Y",
+			want:  true,
+		},
+		{
+			name:  "same hotkey different modifier order",
+			left:  "Ctrl+Alt+Y",
+			right: "Alt+Ctrl+Y",
+			want:  true,
+		},
+		{
+			name:  "same hotkey different case and spaces",
+			left:  "Ctrl+Alt+Y",
+			right: "ctrl + alt + y",
+			want:  true,
+		},
+		{
+			name:  "different key",
+			left:  "Ctrl+Alt+Y",
+			right: "Ctrl+Alt+R",
+			want:  false,
+		},
+		{
+			name:    "invalid hotkey",
+			left:    "Ctrl+Alt+Unknown",
+			right:   "Ctrl+Alt+Y",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := SameHotKey(tt.left, tt.right)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("expected no error, got %v", err)
+			}
+
+			if got != tt.want {
+				t.Fatalf("expected %v, got %v", tt.want, got)
+			}
+		})
+	}
+}

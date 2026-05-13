@@ -15,6 +15,8 @@ import (
 	"golang.design/x/hotkey/mainthread"
 )
 
+const configPath = "config.json"
+
 func main() {
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
@@ -70,7 +72,7 @@ func addBind() {
 		log.Fatal("Invalid hotkey:", err)
 	}
 
-	binds, err := config.Load("config.json")
+	binds, err := config.Load(configPath)
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
@@ -80,14 +82,19 @@ func addBind() {
 			log.Fatal("Bind with this name already exists:", newBind.Name)
 		}
 
-		if strings.EqualFold(bind.Hotkey, newBind.Hotkey) {
+		sameHotkey, err := hotkeys.SameHotKey(bind.Hotkey, newBind.Hotkey)
+		if err != nil {
+			log.Fatal("Failed to compare hotkeys:", err)
+		}
+
+		if sameHotkey {
 			log.Fatal("Bind with this hotkey already exists:", newBind.Hotkey)
 		}
 	}
 
 	binds = append(binds, newBind)
 
-	if err := config.Save("config.json", binds); err != nil {
+	if err := config.Save(configPath, binds); err != nil {
 		log.Fatal("Failed to save config:", err)
 	}
 
@@ -98,7 +105,7 @@ func seeBinds() {
 	if len(os.Args) > 2 {
 		fmt.Println("You do not need to write more arguments then just 'see'")
 	}
-	binds, err := config.Load("config.json")
+	binds, err := config.Load(configPath)
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
@@ -130,7 +137,7 @@ func deleteBind() {
 
 	namesToDelete := os.Args[2:]
 
-	binds, err := config.Load("config.json")
+	binds, err := config.Load(configPath)
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
@@ -159,7 +166,7 @@ func deleteBind() {
 		log.Fatal("Bind not found:", namesToDelete)
 	}
 
-	if err := config.Save("config.json", filtered); err != nil {
+	if err := config.Save(configPath, filtered); err != nil {
 		log.Fatal("Failed to save config:", err)
 	}
 
@@ -167,7 +174,7 @@ func deleteBind() {
 }
 
 func deleteAll() {
-	if err := config.Save("config.json", []config.Bind{}); err != nil {
+	if err := config.Save(configPath, []config.Bind{}); err != nil {
 		log.Fatal("Failed to save config:", err)
 	}
 
@@ -180,7 +187,7 @@ func run() {
 	manager := hotkeys.NewManager()
 	defer manager.UnregisterAll() // активируется при завершении функции run, что удаляет все хоткеи
 
-	configBinds, err := config.Load("config.json")
+	configBinds, err := config.Load(configPath)
 	if err != nil {
 		log.Fatal("Error of read json:", err)
 	}

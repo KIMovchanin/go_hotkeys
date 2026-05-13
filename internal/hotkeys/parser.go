@@ -115,3 +115,40 @@ func ParseHotKey(text string) ([]hotkey.Modifier, hotkey.Key, error) {
 
 	return nil, 0, fmt.Errorf("invalid hotkey: %q", text)
 }
+
+func SameHotKey(left string, right string) (bool, error) {
+	leftMods, leftKey, err := ParseHotKey(left)
+	if err != nil {
+		return false, err
+	}
+
+	reightMods, rightKey, err := ParseHotKey(right)
+	if err != nil {
+		return false, err
+	}
+
+	if leftKey != rightKey {
+		return false, nil
+	}
+
+	if len(leftMods) != len(reightMods) {
+		return false, nil
+	}
+
+	seen := make(map[hotkey.Modifier]bool, len(leftMods))
+
+	for _, mod := range leftMods {
+		seen[mod] = true
+	}
+
+	// Если хоть 1 из модификаторов из правой части небыл найден в списке
+	// модификаторов из левой части, то закончим с ошибкой.
+	for _, mod := range reightMods {
+		if !seen[mod] {
+			return false, nil
+		}
+	}
+
+	return true, nil
+
+}
